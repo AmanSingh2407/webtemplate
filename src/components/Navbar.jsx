@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LayoutGrid, Bell, User, LogOut, Check, Sparkles, Menu, X, ChevronDown, FolderPlus } from 'lucide-react';
+import { LayoutGrid, Bell, User, LogOut, Check, Sparkles, Menu, X, ChevronDown, FolderPlus, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { getStorage, setStorage, KEYS } from '../utils/storage';
 import { Avatar } from './Avatar';
 import { Button } from './Button';
@@ -9,6 +10,7 @@ import { Button } from './Button';
 export const Navbar = ({ isPublic = false, toggleMobileSidebar }) => {
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuth();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [notifications, setNotifications] = useState(() => getStorage(KEYS.NOTIFICATIONS, []));
   const [showNotifs, setShowNotifs] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -63,6 +65,15 @@ export const Navbar = ({ isPublic = false, toggleMobileSidebar }) => {
 
           {/* Desktop Right Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Quick Dark/Light Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 border border-white/5 transition-colors cursor-pointer"
+              title={isDarkMode ? 'Switch to Day Mode' : 'Switch to Dark Mode'}
+            >
+              {isDarkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-blue-500" />}
+            </button>
+
             {isAuthenticated ? (
               <Button variant="primary" onClick={() => navigate('/home')} icon={Sparkles}>
                 Go to Dashboard
@@ -80,12 +91,21 @@ export const Navbar = ({ isPublic = false, toggleMobileSidebar }) => {
           </div>
 
           {/* Mobile Menu Toggle Button */}
-          <button
-            onClick={() => setMobilePublicMenu(!mobilePublicMenu)}
-            className="md:hidden p-2 text-neutral-400 hover:text-white"
-          >
-            {mobilePublicMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-neutral-400 hover:text-white"
+              title="Toggle Theme"
+            >
+              {isDarkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-blue-500" />}
+            </button>
+            <button
+              onClick={() => setMobilePublicMenu(!mobilePublicMenu)}
+              className="p-2 text-neutral-400 hover:text-white"
+            >
+              {mobilePublicMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Public Nav Drawer */}
@@ -152,8 +172,21 @@ export const Navbar = ({ isPublic = false, toggleMobileSidebar }) => {
         </h2>
       </div>
 
-      {/* Right side controls: Notifications + Profile */}
+      {/* Right side controls: Theme Toggle + Notifications + Profile */}
       <div className="flex items-center gap-3">
+        {/* Quick Dark / Day Mode Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 border border-white/5 transition-colors cursor-pointer"
+          title={isDarkMode ? 'Switch to Day (Light) Mode' : 'Switch to Dark Mode'}
+        >
+          {isDarkMode ? (
+            <Sun className="w-5 h-5 text-amber-400" />
+          ) : (
+            <Moon className="w-5 h-5 text-blue-500" />
+          )}
+        </button>
+
         {/* Notifications Dropdown */}
         <div className="relative">
           <button

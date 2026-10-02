@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { getStorage, setStorage, removeStorage, KEYS } from '../utils/storage';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../context/ToastContext';
 import { Sidebar } from '../components/Sidebar';
 import { Navbar } from '../components/Navbar';
@@ -21,6 +22,7 @@ import { Button } from '../components/Button';
 
 export const Settings = () => {
   const { user, changePassword } = useAuth();
+  const { isDarkMode, toggleTheme } = useTheme();
   const { addToast } = useToast();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -262,13 +264,17 @@ export const Settings = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-semibold text-white">Dark Mode Interface</h4>
-                    <p className="text-xs text-neutral-400">Modern dark SaaS theme (Enabled by default)</p>
+                    <h4 className="text-sm font-semibold text-white">
+                      {isDarkMode ? 'Dark Mode Interface' : 'Day (Light) Mode Interface'}
+                    </h4>
+                    <p className="text-xs text-neutral-400">
+                      {isDarkMode ? 'Currently active: Dark SaaS Theme' : 'Currently active: Day / Light SaaS Theme'}
+                    </p>
                   </div>
                   <input
                     type="checkbox"
-                    checked={settings.darkMode}
-                    onChange={() => handleToggle('darkMode')}
+                    checked={isDarkMode}
+                    onChange={toggleTheme}
                     className="w-5 h-5 rounded bg-[#161616] border-white/20 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
                 </div>
