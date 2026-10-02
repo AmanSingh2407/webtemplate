@@ -8,8 +8,10 @@ export const KEYS = {
   PROJECTS: 'app_projects',
   SETTINGS: 'app_settings',
   NOTIFICATIONS: 'app_notifications',
-  SEEDED: 'app_seeded_v2'
+  SEEDED: 'app_seeded_v3'
 };
+
+export const MALE_AVATAR_DEFAULT = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80';
 
 export const getStorage = (key, defaultValue = null) => {
   try {
@@ -39,16 +41,34 @@ export const removeStorage = (key) => {
 
 // Seed initial demo state if not present
 export const seedInitialStorage = () => {
-  // Migration check for existing stored user
+  const FEMALE_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
+
+  // Migration check for existing stored user avatar & name
   const currentUser = getStorage(KEYS.USER, null);
-  if (currentUser && currentUser.name === 'Aman Sharma') {
-    const updatedUser = { ...currentUser, name: 'Aman Singh' };
-    setStorage(KEYS.USER, updatedUser);
+  if (currentUser) {
+    let updated = false;
+    let newObj = { ...currentUser };
+    if (newObj.name === 'Aman Sharma') {
+      newObj.name = 'Aman Singh';
+      updated = true;
+    }
+    if (!newObj.avatar || newObj.avatar === FEMALE_AVATAR) {
+      newObj.avatar = MALE_AVATAR_DEFAULT;
+      updated = true;
+    }
+    if (updated) {
+      setStorage(KEYS.USER, newObj);
+    }
   }
 
   const existingUsers = getStorage(KEYS.USERS, []);
   if (existingUsers.length > 0) {
-    const updatedUsers = existingUsers.map(u => u.name === 'Aman Sharma' ? { ...u, name: 'Aman Singh' } : u);
+    const updatedUsers = existingUsers.map(u => {
+      let copy = { ...u };
+      if (copy.name === 'Aman Sharma') copy.name = 'Aman Singh';
+      if (!copy.avatar || copy.avatar === FEMALE_AVATAR) copy.avatar = MALE_AVATAR_DEFAULT;
+      return copy;
+    });
     setStorage(KEYS.USERS, updatedUsers);
   }
 
@@ -80,7 +100,8 @@ export const seedInitialStorage = () => {
       productUpdates: true,
       marketingEmails: false,
       darkMode: true,
-      compactMode: false
+      compactMode: false,
+      accentColor: 'blue'
     };
 
     // Seed demo user if no users exist
@@ -90,7 +111,7 @@ export const seedInitialStorage = () => {
         name: 'Aman Singh',
         email: 'demo@example.com',
         password: 'Demo@123', // NOTE: Demo authentication only
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+        avatar: MALE_AVATAR_DEFAULT,
         createdAt: new Date().toISOString()
       };
       setStorage(KEYS.USERS, [demoUser]);

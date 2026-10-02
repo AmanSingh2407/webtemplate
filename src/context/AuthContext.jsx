@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getStorage, setStorage, removeStorage, KEYS, seedInitialStorage } from '../utils/storage';
+import { getStorage, setStorage, removeStorage, KEYS, seedInitialStorage, MALE_AVATAR_DEFAULT } from '../utils/storage';
 
 const AuthContext = createContext(null);
 
@@ -20,20 +20,18 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (email, password) => {
-    // Demo authentication check against stored users
     const users = getStorage(KEYS.USERS, []);
     const foundUser = users.find(
       (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
     );
 
     if (!foundUser) {
-      // Allow fallback login with demo@example.com / Demo@123 if user deleted or custom
       if (email.toLowerCase() === 'demo@example.com' && password === 'Demo@123') {
         const demoUser = {
           id: 'user-demo-123',
           name: 'Aman Singh',
           email: 'demo@example.com',
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+          avatar: MALE_AVATAR_DEFAULT,
           createdAt: new Date().toISOString()
         };
         setStorage(KEYS.USER, demoUser);
@@ -47,7 +45,7 @@ export const AuthProvider = ({ children }) => {
       id: foundUser.id,
       name: foundUser.name,
       email: foundUser.email,
-      avatar: foundUser.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      avatar: foundUser.avatar || MALE_AVATAR_DEFAULT,
       createdAt: foundUser.createdAt
     };
 
@@ -69,7 +67,7 @@ export const AuthProvider = ({ children }) => {
       name,
       email,
       password,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
+      avatar: MALE_AVATAR_DEFAULT,
       createdAt: new Date().toISOString()
     };
 
@@ -100,13 +98,28 @@ export const AuthProvider = ({ children }) => {
     setUser(updatedUser);
     setStorage(KEYS.USER, updatedUser);
 
-    // Also update in app_users
     const users = getStorage(KEYS.USERS, []);
     const idx = users.findIndex((u) => u.id === user.id);
     if (idx !== -1) {
       users[idx] = { ...users[idx], ...updatedFields };
       setStorage(KEYS.USERS, users);
     }
+  };
+
+  const changePassword = (currentPassword, newPassword) => {
+    if (!user) return { success: false, message: 'User not authenticated' };
+    const users = getStorage(KEYS.USERS, []);
+    const idx = users.findIndex((u) => u.id === user.id || u.email.toLowerCase() === user.email.toLowerCase());
+
+    if (idx !== -1 && users[idx].password && users[idx].password !== currentPassword) {
+      return { success: false, message: 'Current password does not match.' };
+    }
+
+    if (idx !== -1) {
+      users[idx].password = newPassword;
+      setStorage(KEYS.USERS, users);
+    }
+    return { success: true, message: 'Password updated successfully!' };
   };
 
   return (
@@ -118,6 +131,7 @@ export const AuthProvider = ({ children }) => {
         signup,
         logout,
         updateProfile,
+        changePassword,
         isAuthenticated: !!user
       }}
     >
