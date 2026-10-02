@@ -49,13 +49,6 @@ export const Settings = () => {
     addToast('Preference updated', 'info');
   };
 
-  const handleAccentChange = (color) => {
-    const updated = { ...settings, accentColor: color };
-    setSettingsState(updated);
-    setStorage(KEYS.SETTINGS, updated);
-    addToast(`Accent theme updated to ${color}`, 'success');
-  };
-
   const handleSaveSettings = () => {
     setStorage(KEYS.SETTINGS, settings);
     addToast('Platform settings saved successfully!', 'success');
@@ -291,32 +284,6 @@ export const Settings = () => {
                     onChange={() => handleToggle('compactMode')}
                     className="w-5 h-5 rounded bg-[#161616] border-white/20 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-2">Accent Theme Color</label>
-                  <div className="flex gap-3">
-                    {[
-                      { id: 'blue', color: 'bg-blue-600', name: 'Electric Blue' },
-                      { id: 'purple', color: 'bg-purple-600', name: 'Royal Purple' },
-                      { id: 'emerald', color: 'bg-emerald-600', name: 'Emerald Green' },
-                      { id: 'rose', color: 'bg-rose-600', name: 'Rose Pink' }
-                    ].map((accent) => (
-                      <button
-                        key={accent.id}
-                        type="button"
-                        onClick={() => handleAccentChange(accent.id)}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
-                          settings.accentColor === accent.id
-                            ? 'border-white text-white bg-white/10 ring-2 ring-blue-500/50'
-                            : 'border-white/10 text-neutral-400 hover:text-white bg-white/5'
-                        }`}
-                      >
-                        <span className={`w-3.5 h-3.5 rounded-full ${accent.color}`} />
-                        {accent.name}
-                      </button>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
